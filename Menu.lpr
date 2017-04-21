@@ -9,12 +9,11 @@
 директор. В случае реализации таблицы No3 в таблице No1 вместо ввода названия
 предприятия осуществляется ее выбор из таблицы No3.}
 
-program Menvu;
-//
-uses Files,MenuModyl,table;
-//
-var arr:array[1..101] of LME;
-//
+program pMenu;
+//используемые модули
+uses Files,MenuModyl,table,other;
+//Переменная типа ALME
+var arr:ALME;
 begin
   Menu(arr);
 end.
