@@ -42,7 +42,7 @@ begin
 //   c1 - 195   c1 - 218    c1 - 192
 //   c2 - 196   c2 - 196    c2 - 196
 //   c3 - 197   c3 - 194    c3 - 193
-//   c4 - 180   c4 - 191    c4 - 207
+//   c4 - 180   c4 - 191    c4 - 217
   if long=1 then begin
     write(c1);
     for k:=1 to 19 do write(c2);
@@ -143,4 +143,5 @@ begin
     delay(300);
   end;
 end;
+//
 end.

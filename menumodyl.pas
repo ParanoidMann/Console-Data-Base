@@ -36,7 +36,7 @@ var exit_from_menu:boolean;
     for i:=1 to 30 do write(#205);
     writeln(#188);
     gotoxy(2,29);
-    writeln('V.3');
+    writeln('V.3.2');
   end;
   //Clear- процедура возврата шрифта строки,с которой вы ушли, в первоначальный.
   //c - положение курсора

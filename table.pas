@@ -9,11 +9,12 @@ implementation
 //
 var max  :integer = 0;
 procedure open_table(var arr:ALME);
-var n    :integer = 1;
-    j    :integer;
-    mid  :integer = 1;
-    k    :char;
-    exit :boolean;
+var n:       integer = 1;
+    j:       integer;
+    mid:     integer = 1;
+    k:       char;
+    exit:    boolean;
+    pagemin: integer = 1;
 //
   procedure back(mid:integer;var arr:ALME;n,j:integer);
   begin
@@ -90,12 +91,13 @@ var n    :integer = 1;
     end;
   end;
 //
-  procedure move_down(var n:integer; var j:integer;  max:integer;arr:ALME;mid:integer);
+  procedure move_down(var n:integer; var j,pagemax:integer;max:integer;arr:ALME;mid:integer);
   begin
     if (n<100) then begin
       inc(n);
       if (j>26) and (n>max) then begin
         clrscr;
+        pagemax:=n;
         j:=2;
         line(#218,#196,#194,#191,1);
         add_to_arr(arr,n);
@@ -104,7 +106,10 @@ var n    :integer = 1;
         line(#192,#196,#193,#217,1);
         gotoxy(1,j);
       end
-      else if (j>26) then page_down(j,n,max,mid)
+      else if (j>26) then begin
+        pagemax:=n;
+        page_down(j,n,max,mid);
+      end
       else begin
         add_to_arr(arr,n);
         j:=j+2;
@@ -112,39 +117,40 @@ var n    :integer = 1;
         gotoxy(1,j-1);
         line(#195,#196,#197,#180,1);
         back(mid,arr,n,j);
-        line(#192,#196,#193,#217,1);
+        if n>=max then line(#192,#196,#193,#217,1)
+        else line(#195,#196,#197,#180,1);
         gotoxy(1,j);
       end;
     end;
   end;
 //
-  procedure move_up(var n:integer;var j:integer;arr:ALME;mid:integer);
-//
-    procedure page_up(var j:integer;var n:integer; arr:ALME);
-    var i:integer;
-    begin
-      clrscr;
-      gotoxy(1,1);
-      line(#218,#196,#194,#191,1);
-      j:=1;
-      dec(n);
-      for i:=n-13 to n do begin
-        inc(j);
-        gotoxy(1,j);
-        writeln(#179 ,' ', writepart(arr[i].name,17):17 ,' ',#179 ,' ', writepart(arr[i].model,7):7 ,' ',#179 ,' ', writepart(arr[i].dev.FIO,12):12 ,' ',#179 ,' ', writepart(arr[i].company.name,12):12 ,' ',#179 ,' ', writepart(arr[i].cost,10):10 ,' ',#179 ,' ', writepart(arr[i].Ttype,4):4 ,' ',#179);
-        inc(j);
-        gotoxy(1,j);
-        line(#195,#196,#197,#180,1);
-      end;
-      gotoxy(1,j);
-      line(#192,#196,#193,#217,1);
-      dec(j);
-      back(mid,arr,n,j);
-      gotoxy(1,j);
-    end;
-//
+  procedure page_up(var j:integer;var n,pagemax:integer; arr:ALME);
+  var i:integer;
   begin
-    if (j<=2) and (n>14) then page_up(j,n,arr)
+    clrscr;
+    pagemax:=pagemax-14;
+    gotoxy(1,1);
+    line(#218,#196,#194,#191,1);
+    j:=1;
+    dec(n);
+    for i:=n-13 to n do begin
+      inc(j);
+      gotoxy(1,j);
+      writeln(#179 ,' ', writepart(arr[i].name,17):17 ,' ',#179 ,' ', writepart(arr[i].model,7):7 ,' ',#179 ,' ', writepart(arr[i].dev.FIO,12):12 ,' ',#179 ,' ', writepart(arr[i].company.name,12):12 ,' ',#179 ,' ', writepart(arr[i].cost,10):10 ,' ',#179 ,' ', writepart(arr[i].Ttype,4):4 ,' ',#179);
+      inc(j);
+      gotoxy(1,j);
+      line(#195,#196,#197,#180,1);
+    end;
+    gotoxy(1,j);
+    line(#192,#196,#193,#217,1);
+    dec(j);
+    back(mid,arr,n,j);
+    gotoxy(1,j);
+  end;
+//
+  procedure move_up(var n:integer;var j:integer;arr:ALME;mid:integer);
+  begin
+    if (j<=2) and (n>14) then page_up(j,n,pagemin,arr)
     else begin
       j:=j-2;
       write(#179 ,' ', writepart(arr[n].name,17):17 ,' ',#179 ,' ', writepart(arr[n].model,7):7 ,' ',#179 ,' ', writepart(arr[n].dev.FIO,12):12 ,' ',#179 ,' ', writepart(arr[n].company.name,12):12 ,' ',#179 ,' ', writepart(arr[n].cost,10):10 ,' ',#179 ,' ', writepart(arr[n].Ttype,4):4 ,' ',#179);
@@ -208,6 +214,54 @@ var n    :integer = 1;
     gotoxy(1,j);
   end;
 //
+  procedure Deleteline(var arr:ALME; var max:integer; var n:integer; var j:integer);
+  var i,f,h:integer;
+  begin
+    if n>=max then begin
+      arr[n].name:='';
+      arr[n].model:='';
+      arr[n].dev.FIO:='';
+      arr[n].company.name:='';
+      arr[n].cost:='';
+      arr[n].Ttype:='';
+      arr[n].dev.year:='';
+      arr[n].dev.sex:='';
+    end
+    else for i:=n to max do begin
+      arr[i].name:=arr[i+1].name;
+      arr[i].model:=arr[i+1].model;
+      arr[i].dev.FIO:=arr[i+1].dev.FIO;
+      arr[i].company.name:=arr[i+1].company.name;
+      arr[i].cost:=arr[i+1].cost;
+      arr[i].Ttype:=arr[i+1].Ttype;
+      arr[i].dev.year:=arr[i+1].dev.year;
+      arr[i].dev.sex:=arr[i+1].dev.sex;
+    end;
+    if (n=1) then begin
+      dec(max);
+      page_down(j,n,max,mid);
+    end
+    else if (pagemin=max) then begin
+      dec(max);
+      page_up(j,n,pagemin,arr);
+    end
+    else if (n = pagemin) then begin
+      dec(max);
+      page_down(j,n,max,mid);
+    end
+    else begin
+      j:=j-2;
+      f:=j;
+      dec(max);
+      dec(n);
+      if n+13<max then h:=n+13 else h:=max;
+      page_down(f,pagemin,h,mid);
+      gotoxy(1,2);
+      write(#179 ,' ',writepart(arr[pagemin].name,17):17 ,' ',#179 ,' ', writepart(arr[pagemin].model,7):7 ,' ',#179 ,' ', writepart(arr[pagemin].dev.FIO,12):12 ,' ',#179 ,' ', writepart(arr[pagemin].company.name,12):12 ,' ',#179 ,' ', writepart(arr[pagemin].cost,10):10 ,' ',#179 ,' ', writepart(arr[pagemin].Ttype,4):4 ,' ',#179);
+      back(mid,arr,n,j);
+    end;
+  end;
+//
   begin
     clrscr;
     j:=2;
@@ -226,19 +280,21 @@ var n    :integer = 1;
     end;
     exit:=false;
     repeat
-      add_to_arr(arr,n);
       if (n>max) then max:=n;
+      add_to_arr(arr,n);
+      gotoxy(1,j);
       k:=readkey;
       case k of
         #27:exit:=true;
         #72:If (n>1) then move_up(n,j,arr,mid);
-        #80:If (n<=100) then move_down(n,j,max,arr,mid);
+        #80:If (n<=100) then move_down(n,j,pagemin,max,arr,mid);
         #75:If mid>1 then begin
           dec(mid);
           back(mid,arr,n,j);
           gotoxy(1,j);
         end;
         #13:entering(arr,n,mid,j);
+        #8:if max>1 then deleteline(arr,max,n,j) else show_error('У вас всего один элемент');
         #77:if mid<6 then begin
           inc(mid);
           back(mid,arr,n,j);
@@ -249,11 +305,12 @@ var n    :integer = 1;
   end;
 //
 procedure open_second_table(var arr:ALME);
-var n    :integer = 1;
-    j    :integer;
-    mid  :integer = 1;
-    k    :char;
-    exit :boolean;
+var n:       integer = 1;
+    j:       integer;
+    mid:     integer = 1;
+    k:       char;
+    exit:    boolean;
+    pagemin: integer = 1;
 //
   procedure return(mid:integer;var arr:ALME;n,j:integer);
   begin
@@ -311,12 +368,13 @@ var n    :integer = 1;
     end;
   end;
 //
-  procedure down(var n:integer; var j:integer;smax:integer;arr:ALME;mid:integer);
+ procedure down(var n:integer; var j,pagemax:integer;max:integer;arr:ALME;mid:integer);
   begin
     if (n<100) then begin
       inc(n);
-      if (j>26) and (n>smax) then begin
+      if (j>26) and (n>max) then begin
         clrscr;
+        pagemax:=n;
         j:=2;
         line(#218,#196,#194,#191,0);
         add_to_arr(arr,n);
@@ -325,7 +383,10 @@ var n    :integer = 1;
         line(#192,#196,#193,#217,0);
         gotoxy(1,j);
       end
-      else if (j>26) then next_page(j,n,smax,mid)
+      else if (j>26) then begin
+        pagemax:=n;
+        next_page(j,n,max,mid);
+      end
       else begin
         add_to_arr(arr,n);
         j:=j+2;
@@ -334,40 +395,41 @@ var n    :integer = 1;
         gotoxy(1,j-1);
         line(#195,#196,#197,#180,0);
         return(mid,arr,n,j);
-        line(#192,#196,#193,#217,0);
+        if n>=max then line(#192,#196,#193,#217,0)
+        else line(#195,#196,#197,#180,0);
         gotoxy(1,j);
-     end;
+      end;
     end;
   end;
-//
-  procedure up(var n:integer;var j:integer;arr:ALME;mid:integer);
   //
-    procedure prev_page(var j:integer;var n:integer; arr:ALME);
-    var i:integer;
-    begin
-      clrscr;
-      gotoxy(1,1);
-      line(#218,#196,#194,#191,0);
-      j:=1;
-      dec(n);
-      for i:=n-13 to n do begin
-        inc(j);
-        gotoxy(1,j);
-        space_writer(1,1,40);
-        writeln(#179,' ',writepart(arr[i].dev.FIO,12):12 ,' '#179 ,' ', writepart(arr[i].dev.year,5):5,' ',#179,' ',writepart(arr[i].dev.sex,8):8,' ',#179);
-        inc(j);
-        gotoxy(1,j);
-        line(#195,#196,#197,#180,0);
-      end;
-      gotoxy(1,j);
-      line(#192,#196,#193,#217,0);
-      dec(j);
-      return(mid,arr,n,j);
-      gotoxy(1,j);
-    end;
-  //
+  procedure prev_page(var j:integer;var n,pagemax:integer; arr:ALME);
+  var i:integer;
   begin
-    if (j<=2) and (n>14) then prev_page(j,n,arr)
+    clrscr;
+    pagemax:=pagemax-14;
+    gotoxy(1,1);
+    line(#218,#196,#194,#191,0);
+    j:=1;
+    dec(n);
+    for i:=n-13 to n do begin
+      inc(j);
+      gotoxy(1,j);
+      space_writer(1,1,40);
+      writeln(#179,' ',writepart(arr[i].dev.FIO,12):12 ,' '#179 ,' ', writepart(arr[i].dev.year,5):5,' ',#179,' ',writepart(arr[i].dev.sex,8):8,' ',#179);
+      inc(j);
+      gotoxy(1,j);
+      line(#195,#196,#197,#180,0);
+    end;
+    gotoxy(1,j);
+    line(#192,#196,#193,#217,0);
+    dec(j);
+    return(mid,arr,n,j);
+    gotoxy(1,j);
+  end;
+    //
+  procedure up(var n:integer;var j:integer;arr:ALME;mid:integer);
+  begin
+    if (j<=2) and (n>14) then prev_page(j,n,pagemin,arr)
     else begin
       j:=j-2;
       space_writer(1,1,40);
@@ -444,6 +506,55 @@ var n    :integer = 1;
     gotoxy(1,j);
   end;
 //
+  procedure Dell_line(var arr:ALME; var max:integer; var n:integer; var j:integer);
+    var i,f,h:integer;
+    begin
+      if n>=max then begin
+      arr[n].name:='';
+      arr[n].model:='';
+      arr[n].dev.FIO:='';
+      arr[n].company.name:='';
+      arr[n].cost:='';
+      arr[n].Ttype:='';
+      arr[n].dev.year:='';
+      arr[n].dev.sex:='';
+    end
+    else for i:=n to max do begin
+      arr[i].name:=arr[i+1].name;
+      arr[i].model:=arr[i+1].model;
+      arr[i].dev.FIO:=arr[i+1].dev.FIO;
+      arr[i].company.name:=arr[i+1].company.name;
+      arr[i].cost:=arr[i+1].cost;
+      arr[i].Ttype:=arr[i+1].Ttype;
+      arr[i].dev.year:=arr[i+1].dev.year;
+      arr[i].dev.sex:=arr[i+1].dev.sex;
+    end;
+    if (n=1) then begin
+      dec(max);
+      next_page(j,n,max,mid);
+    end
+    else if (pagemin=max) then begin
+      dec(max);
+      prev_page(j,n,pagemin,arr);
+    end
+    else if (n = pagemin) then begin
+      dec(max);
+      next_page(j,n,max,mid);
+    end
+    else begin
+      j:=j-2;
+      f:=j;
+      dec(max);
+      dec(n);
+      if n+13<max then h:=n+13 else h:=max;
+      next_page(f,pagemin,h,mid);
+      gotoxy(1,2);
+      space_writer(1,1,40);
+      write(#179,' ',writepart(arr[pagemin].dev.FIO,12):12 ,' '#179 ,' ', writepart(arr[pagemin].dev.year,5):5,' ',#179,' ',writepart(arr[pagemin].dev.sex,8):8,' ',#179);
+      return(mid,arr,n,j);
+    end;
+  end;
+//
 begin
   clrscr;
   j:=2;
@@ -464,17 +575,19 @@ begin
   repeat
     add_to_arr(arr,n);
     if (n>max) then max:=n;
+    gotoxy(1,j);
     k:=readkey;
     case k of
       #27:exit:=true;
       #72:If (n>1) then up(n,j,arr,mid);
-      #80:If (n<=100) then down(n,j,max,arr,mid);
+      #80:If (n<=100) then down(n,j,pagemin,max,arr,mid);
       #75:If mid>1 then begin
         dec(mid);
         return(mid,arr,n,j);
         gotoxy(1,j);
       end;
       #13:enter(arr,n,mid,j);
+      #8:if max>1 then dell_line(arr,max,n,j) else show_error('У вас всего один элемент');
       #77:if mid<3 then begin
         inc(mid);
         return(mid,arr,n,j);
