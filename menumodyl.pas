@@ -6,11 +6,15 @@ uses crt,files,table,other;
 procedure menu(var arr:ALME);
 //описание процедур
 implementation
+var buffarr:ABUFF;
+    devarr:ADEV;
 //Menu - Процедура вызова меню
 //arr - переменная типа ALME, в которой хранятся все вводимые данные в БД
 //Процедура отрисовывает меню, из которого можно выйти в таблицу 1 и 2, сохранить и загрусить в(из) файлы и выйти из программы.
 Procedure Menu(var arr:ALME);
 var exit_from_menu:boolean;
+    max:     word = 0;
+    DevMax:  word = 0;
   //call_menu - процедура отрисовки меню
   procedure call_menu;
   var i:integer;
@@ -36,7 +40,7 @@ var exit_from_menu:boolean;
     for i:=1 to 30 do write(#205);
     writeln(#188);
     gotoxy(2,29);
-    writeln('V.3.2');
+    writeln('V.4');
   end;
   //Clear- процедура возврата шрифта строки,с которой вы ушли, в первоначальный.
   //c - положение курсора
@@ -95,14 +99,14 @@ var exit_from_menu:boolean;
     case c of
       12:begin
         Loading;
-        Open_table(arr);
+        Open_table(arr,max,buffarr,devarr,devmax);
       end;
       13:begin
         Loading;
-        Open_second_table(arr);
+        Open_second_table(devmax,buffarr,devarr);
       end;
-      {14:
-      15:}
+      14:save_to_file(arr,max,devmax,devarr);
+      15:Load_From_File(arr,max,devmax,buffarr,devarr);
       16:exit_from_menu:=true;
     else exit_from_menu:=true;
     end
