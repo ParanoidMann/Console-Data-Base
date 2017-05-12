@@ -1,14 +1,16 @@
 unit Files;
 
 interface
-
+//модули
 uses crt,other,sysutils;
-
+//процедуры
 procedure Save_To_File(Arr:ALME;max,devmax:integer;devarr:ADEV);
 procedure Load_From_File(var Arr:ALME;var max,devmax:word;var buffarr:ABUFF;var devarr:ADEV);
 
 implementation
-//
+//Save_To_File - сохранение данных в бестиповый файл.
+//arr,devarr - массивы к сохранению.
+//max,devmax - максимумы массивов.
   procedure Save_To_File(Arr:ALME;max,devmax:integer;devarr:ADEV);
   var untfile:  file;
       i,n,j:    integer;
@@ -52,7 +54,9 @@ implementation
     end;
     close(untfile);
   end;
-  //
+  //Load_From_File - загрузка данных из бестипового файла.
+  //arr,devarr,buffarr - массивы для загрузки.
+  //max,devmax - максимумы массивов.
   procedure Load_From_File(var Arr:ALME;var max,devmax:word;var buffarr:ABUFF;var devarr:ADEV);
   var untfile: file;
       i,n,j:   integer;
@@ -128,7 +132,7 @@ implementation
       end;
       if (error<>0) then show_error('Некорректная загрузка');
       if (arr[n].cost<>0) then buffarr[n].cost:=inttostr(arr[n].cost)
-      else buffarr[n].cost:='стоимость';
+      else buffarr[n].cost:='Стоимость';
     end;
     //
     {$I-}
@@ -161,9 +165,8 @@ implementation
       end;
       if (error<>0) then show_error('Некорректная загрузка');
       if (devarr[n].year<>0) then buffarr[n].year:=inttostr(devarr[n].year)
-      else buffarr[n].year:=' год';
+      else buffarr[n].year:=' Год';
     end;
-    //
     close(untfile);
   end;
 //

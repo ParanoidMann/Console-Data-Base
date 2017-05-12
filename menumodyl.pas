@@ -3,15 +3,19 @@ interface
 //используемые модули
 uses crt,files,table,other;
 //процедура меню
-procedure menu(var arr:ALME);
+procedure menu;
 //описание процедур
 implementation
-var buffarr:ABUFF;
+var arr:ALME;
+    buffarr:ABUFF;
     devarr:ADEV;
 //Menu - Процедура вызова меню
 //arr - переменная типа ALME, в которой хранятся все вводимые данные в БД
-//Процедура отрисовывает меню, из которого можно выйти в таблицу 1 и 2, сохранить и загрусить в(из) файлы и выйти из программы.
-Procedure Menu(var arr:ALME);
+//Процедура меню бд, из которого можно выйти в остальные вкладки меню(таблицы, сохранение,загрузка,помощь...).
+//exit_from_menu - флаг выхода из меню
+//max - текущий максимум строк основного массива
+//DevMax - текущий максимум строк массива разработчиков
+Procedure Menu;
 var exit_from_menu:boolean;
     max:     word = 0;
     DevMax:  word = 0;
@@ -34,16 +38,17 @@ var exit_from_menu:boolean;
     writeln('                                           ', #186 ,'       Открыть таблицу 2      ',#186);
     writeln('                                           ', #186 ,'           сохранить          ',#186);
     writeln('                                           ', #186 ,'           загрузить          ',#186);
+    Writeln('                                           ', #186 ,'             помощь           ',#186);
     writeln('                                           ', #186 ,'             выйти            ',#186);
     writeln('                                           ', #186 ,'                              ',#186);
     write('                                           ',#200);
     for i:=1 to 30 do write(#205);
     writeln(#188);
     gotoxy(2,29);
-    writeln('V.4');
+    writeln('V.5 (sort)');
   end;
   //Clear- процедура возврата шрифта строки,с которой вы ушли, в первоначальный.
-  //c - положение курсора
+  //c - текущее положение курсора.
   procedure Clear(c: integer);
   begin
     textcolor(15);
@@ -54,14 +59,17 @@ var exit_from_menu:boolean;
       13: Write('       открыть таблицу 2      ');
       14: Write('           сохранить          ');
       15: Write('           загрузить          ');
-      16: Write('             выйти            ');
+      16: Write('             помощь           ');
+      17: Write('             выйти            ');
     end;
     write(#186);
     gotoxy(1, c);
   end;
-  //keys - Функция переключения клавишами между строк
-  //arr - используемый массив
-  Function keys(var arr:ALME):boolean ;
+  //keys - Функция переключения клавишами между строк.
+  //arr,buffarr,devarr - используемые массивы.
+  //k - хранит значение нажатой кнопки
+  //c - номер строки, на которой вы находитесь
+  Function keys(var arr:ALME; var buffarr:ABUFF; var devarr:ADEV):boolean ;
   var k :char;
       c :integer;
   begin
@@ -74,8 +82,8 @@ var exit_from_menu:boolean;
         k:=readkey;
         Clear(c);
         case k of
-          #72:If c=12 then c:=16 else dec(c);
-          #80:If c=16 then c:=12 else inc(c);
+          #72:If c=12 then c:=17 else dec(c);
+          #80:If c=17 then c:=12 else inc(c);
         end;
         gotoxy(1, c);
         Write('                                           ',#186);
@@ -85,17 +93,18 @@ var exit_from_menu:boolean;
           13: Write('     > ОТКРЫТЬ ТАБЛИЦУ 2 <    ');
           14: Write('         > СОХРАНИТЬ <        ');
           15: Write('         > ЗАГРУЗИТЬ <        ');
-          16: Write('           > ВЫЙТИ <          ');
+          16: Write('           > ПОМОЩЬ <         ');
+          17: Write('           > ВЫЙТИ <          ');
         end;
         textcolor(15);
         write(#186);
       end;
       if k = #13 then keys:=true
       else if k = #27 then begin
-        keys:=true;
-        c:=16;
+        keys := true;
+        c:=17;
       end;
-    until keys=true;
+    until keys = true;
     case c of
       12:begin
         Loading;
@@ -107,11 +116,12 @@ var exit_from_menu:boolean;
       end;
       14:save_to_file(arr,max,devmax,devarr);
       15:Load_From_File(arr,max,devmax,buffarr,devarr);
-      16:exit_from_menu:=true;
+      16:helpshower;
+      17:exit_from_menu:=true;
     else exit_from_menu:=true;
     end
   end;
-//основная программа
+//основная программа меню
 begin
   exit_from_menu:=false;
   repeat
@@ -120,7 +130,7 @@ begin
     textcolor(10);
     textbackground(black);
     call_menu;
-    keys(arr);
+    keys(arr,buffarr,devarr);
   until exit_from_menu=true;
 end;
 end.

@@ -13,8 +13,7 @@ program pMenu;
 //используемые модули
 uses Files,MenuModyl,table,other;
 //Переменная типа ALME
-var arr:ALME;
 begin
-  Menu(arr);
+  Menu;
 end.
 

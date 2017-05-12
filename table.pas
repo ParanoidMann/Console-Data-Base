@@ -1,12 +1,16 @@
 unit Table;
 interface
-uses crt,files,other;
-//
-procedure open_table        (var arr:ALME;var max:word;var buffarr:ABUFF;var devarr:ADEV;var DevMax:word);
+//модули
+uses crt,other;
+//процедуры таблиц
+procedure open_table        (var arr:ALME;var max:word;var buffarr:ABUFF; var devarr:ADEV; var DevMax:word);
 procedure open_second_table (var devmax:word; var buffarr:ABUFF; var devarr:ADEV);
 //
 implementation
-//
+//open_table - открывает первую таблицу.
+//arr,buffarr,devarr - используемые массивы.
+//max,devmax - максимумы массивов.
+//после нажатия клавиши esc происходит выход в основное меню.
 procedure open_table(var arr:ALME; var max:word; var buffarr:ABUFF ;var devarr:ADEV; var DevMax:word);
 var n:       integer = 1;
     j:       integer;
@@ -15,7 +19,7 @@ var n:       integer = 1;
     exit:    boolean;
     pagemin: integer = 1;
   //
-  procedure back(mid:integer; var arr:ALME; var devarr:ADEV; n,j:integer);
+  procedure back(mid:integer; var arr:ALME; var devarr:ADEV;var buffarr:ABUFF ;n,j:integer);
   begin
     gotoxy(1,j);
     case mid of
@@ -85,7 +89,7 @@ var n:       integer = 1;
       end;
       gotoxy(1,f);
       line(#192,#196,#193,#217,1);
-      back(mid,arr,devarr,n,j);
+      back(mid,arr,devarr,buffarr,n,j);
       gotoxy(1,j);
     end;
   end;
@@ -100,7 +104,7 @@ var n:       integer = 1;
         j:=2;
         line(#218,#196,#194,#191,1);
         add_to_arr(arr,devarr,n,buffarr);
-        back(mid,arr,devarr,n,j);
+        back(mid,arr,devarr,buffarr,n,j);
         gotoxy(1,3);
         line(#192,#196,#193,#217,1);
         gotoxy(1,j);
@@ -115,7 +119,7 @@ var n:       integer = 1;
         write(#179 ,' ', writepart(arr[n-1].name,17):17 ,' ',#179 ,' ', writepart(arr[n-1].model,7):7 ,' ',#179 ,' ', writepart(devarr[arr[n-1].dev_id].FIO,12):12 ,' ',#179 ,' ', writepart(arr[n-1].company.name,12):12 ,' ',#179 ,' ', writepart(buffarr[n-1].cost,10):10 ,' ',#179 ,' ', writepart(arr[n-1].Ttype,5):5 ,' ',#179);
         gotoxy(1,j-1);
         line(#195,#196,#197,#180,1);
-        back(mid,arr,devarr,n,j);
+        back(mid,arr,devarr,buffarr,n,j);
         if n>=max then line(#192,#196,#193,#217,1)
         else line(#195,#196,#197,#180,1);
         gotoxy(1,j);
@@ -143,7 +147,7 @@ var n:       integer = 1;
     gotoxy(1,j);
     line(#192,#196,#193,#217,1);
     dec(j);
-    back(mid,arr,devarr,n,j);
+    back(mid,arr,devarr,buffarr,n,j);
     gotoxy(1,j);
   end;
 //
@@ -154,7 +158,7 @@ var n:       integer = 1;
       j:=j-2;
       write(#179 ,' ', writepart(arr[n].name,17):17 ,' ',#179 ,' ', writepart(arr[n].model,7):7 ,' ',#179 ,' ', writepart(devarr[arr[n].dev_id].FIO,12):12 ,' ',#179 ,' ', writepart(arr[n].company.name,12):12 ,' ',#179 ,' ', writepart(buffarr[n].cost,10):10 ,' ',#179 ,' ', writepart(arr[n].Ttype,5):5 ,' ',#179);
       dec(n);
-      back(mid,arr,devarr,n,j);
+      back(mid,arr,devarr,buffarr,n,j);
       gotoxy(1,j);
     end;
   end;
@@ -200,7 +204,7 @@ var n:       integer = 1;
             #81:if arr[n].dev_id>1 then dec(arr[n].dev_id);
           end;
         end;
-        back(mid,arr,devarr,n,j);
+        back(mid,arr,devarr,buffarr,n,j);
       until (key=#13) or (key=#27);
       val(buffarr[n].cost,arr[n].cost);
       case mid of
@@ -218,10 +222,11 @@ var n:       integer = 1;
       3:if devarr[n].FIO = LowerCase('Разработчик') then arr[n].dev_id:=1;
       4:if arr[n].company.name = LowerCase('Предприятие') then arr[n].company.name:='';
       5:if buffarr[n].cost = LowerCase('Стоимость') then buffarr[n].cost:='';
-      6:if arr[n].Ttype = LowerCase(' Тип') then arr[n].Ttype:='';
+      6:if arr[n].Ttype = LowerCase('Тип') then arr[n].Ttype:='';
     end;
+    back(mid,arr,devarr,buffarr,n,j);
     stringEnter(arr,n,mid,j);
-    back(mid,arr,devarr,n,j);
+    back(mid,arr,devarr,buffarr,n,j);
     gotoxy(1,j);
   end;
 //
@@ -273,8 +278,66 @@ var n:       integer = 1;
       page_down(f,pagemin,h,mid);
       gotoxy(1,2);
       write(#179 ,' ',writepart(arr[pagemin].name,17):17 ,' ',#179 ,' ', writepart(arr[pagemin].model,7):7 ,' ',#179 ,' ', writepart(devarr[arr[pagemin].dev_id].FIO,12):12 ,' ',#179 ,' ', writepart(arr[pagemin].company.name,12):12 ,' ',#179 ,' ', writepart(buffarr[pagemin].cost,10):10 ,' ',#179 ,' ', writepart(arr[pagemin].Ttype,5):5 ,' ',#179);
-      back(mid,arr,devarr,n,j);
+      back(mid,arr,devarr,buffarr,n,j);
     end;
+  end;
+//
+  procedure sorttable(var devarr:ADEV; var arr:ALME;var buffarr:ABUFF ;max:word; mid,f,n:integer);
+  var i,j,t,l:integer;
+  begin
+    case mid of
+      1:begin
+        for i:=1 to max-1 do
+          for j:=1 to max-i do
+              if arr[j].name > arr[j+1].name then Swap(arr,buffarr,j);
+      end;
+      2:begin
+        for i:=1 to max-1 do
+          for j:=1 to max-i do
+            if arr[j].model > arr[j+1].model then Swap(arr,buffarr,j);
+      end;
+      3:begin
+        for i:=1 to max-1 do
+          for j:=1 to max-i do
+            if devarr[j].FIO > devarr[j+1].FIO then Swap(arr,buffarr,j);
+      end;
+      4:begin
+         for i:=1 to max-1 do
+          for j:=1 to max-i do
+            if arr[j].company.name > arr[j+1].company.name then Swap(arr,buffarr,j);
+      end;
+      5:begin
+        for i:=1 to max-1 do
+          for j:=1 to max-i do
+            if arr[j].cost > arr[j+1].cost then Swap(arr,buffarr,j);
+      end;
+      6:begin
+         for i:=1 to max-1 do
+          for j:=1 to max-i do
+            if arr[j].Ttype > arr[j+1].Ttype then Swap(arr,buffarr,j);
+      end;
+    end;
+    clrscr;
+    t:=2;
+    l:=1;
+    gotoxy(1,2);
+    if (max<15) then begin
+      page_down(t,l,max,mid);
+      gotoxy(1,2);
+      write(#179 ,' ',writepart(arr[1].name,17):17 ,' ',#179 ,' ', writepart(arr[1].model,7):7 ,' ',#179 ,' ', writepart(devarr[arr[1].dev_id].FIO,12):12 ,' ',#179 ,' ', writepart(arr[1].company.name,12):12 ,' ',#179 ,' ', writepart(buffarr[1].cost,10):10 ,' ',#179 ,' ', writepart(arr[1].Ttype,5):5 ,' ',#179);
+      back(mid,arr,devarr,buffarr,n,f);
+      gotoxy(1,f);
+    end
+      else if (max>=15) then begin
+        page_down(t,l,14,mid);
+        back(mid,arr,devarr,buffarr,n,f);
+        gotoxy(1,f);
+      end;
+  end;
+//
+  procedure Search(var arr:ALME; var devarr:ADEV; var buffarr:ABUFF; var mid,n:integer; var max:word);
+  begin
+
   end;
 //
   begin
@@ -283,17 +346,18 @@ var n:       integer = 1;
     if (max<>0) and (max<15) then page_down(j,n,max,mid)
     else if (max<>0) and (max>=15) then begin
       page_down(j,n,14,mid);
-      back(mid,arr,devarr,n,j);
+      back(mid,arr,devarr,buffarr,n,j);
       gotoxy(1,j);
     end
     else begin
       add_to_arr(arr,devarr,1,buffarr);
       line(#218,#196,#194,#191,1);
-      back(mid,arr,devarr,n,j);
+      back(mid,arr,devarr,buffarr,n,j);
       line(#192,#196,#193,#217,1);
       gotoxy(1,j);
     end;
     exit:=false;
+    PrintFild(j);
     repeat
       if (n>max) then max:=n;
       add_to_arr(arr,devarr,n,buffarr);
@@ -305,20 +369,24 @@ var n:       integer = 1;
         #80:If (n<=100) then move_down(n,j,pagemin,max,arr,mid);
         #75:If mid>1 then begin
           dec(mid);
-          back(mid,arr,devarr,n,j);
+          back(mid,arr,devarr,buffarr,n,j);
           gotoxy(1,j);
         end;
         #13:entering(arr,n,mid,j,devmax);
         #8:if max>1 then deleteline(arr,max,n,j) else show_error('У вас всего один элемент');
         #77:if mid<6 then begin
           inc(mid);
-          back(mid,arr,devarr,n,j);
+          back(mid,arr,devarr,buffarr,n,j);
           gotoxy(1,j);
         end;
+        'S','s','Ы','ы':sorttable(devarr,arr,buffarr,max,mid,j,n);
       end;
     until exit=true;
   end;
-//
+//open_second_table - открывает вторую таблицу.
+//buffarr,devarr - используемые массивы.
+//devmax - максимум массива разработчиков.
+//после нажатия клавиши esc происходит выход в основное меню.
 procedure open_second_table(var devmax:word; var buffarr:ABUFF; var devarr:ADEV);
 var n:       integer = 1;
     j:       integer;
@@ -464,9 +532,9 @@ var n:       integer = 1;
       var i:integer;
       begin
         val(buffarr[n].year,i);
-        if buffarr[n].year='' then buffarr[n].year:=' Год'
+        if buffarr[n].year='' then buffarr[n].year:='Год'
         else if i>2017 then begin
-          buffarr[n].year:=' Год';
+          buffarr[n].year:='Год';
           show_error('Год должен быть меньше 2017');
         end
         else if i<1900 then begin
@@ -522,8 +590,8 @@ var n:       integer = 1;
   begin
     case mid of
       1:if devarr[n].FIO = lowercase('Разработчик') then devarr[n].FIO:='';
-      2:if buffarr[n].year = lowercase(' Год') then buffarr[n].year:='';
-      3:if devarr[n].sex = lowercase('  Пол') then devarr[n].sex:='';
+      2:if buffarr[n].year = lowercase('Год') then buffarr[n].year:='';
+      3:if devarr[n].sex = lowercase('Пол') then devarr[n].sex:='';
     end;
     strEnter(devarr,n,mid,j);
     return(mid,devarr,n,j);
@@ -570,6 +638,45 @@ var n:       integer = 1;
       return(mid,devarr,n,j);
     end;
   end;
+  //
+  procedure sortsecondtable(var devarr:ADEV;var buffarr:ABUFF; devmax:word; mid,f,n:integer);
+  var i,j,t,l:integer;
+  begin
+    case mid of
+      1:begin
+        for i:=1 to devmax-1 do
+          for j:=1 to devmax-i do
+              if devarr[j].FIO > devarr[j+1].FIO then DevSwap(devarr,buffarr,j);
+      end;
+      2:begin
+        for i:=1 to devmax-1 do
+          for j:=1 to devmax-i do
+            if devarr[j].year > devarr[j+1].year then DevSwap(devarr,buffarr,j);
+      end;
+      3:begin
+        for i:=1 to devmax-1 do
+          for j:=1 to devmax-i do
+            if devarr[j].sex > devarr[j+1].sex then DevSwap(devarr,buffarr,j);
+      end;
+    end;
+    clrscr;
+    t:=2;
+    l:=1;
+    gotoxy(1,2);
+    if (devmax<15) then begin
+      next_page(t,l,devmax,mid);
+      gotoxy(1,2);
+      space_writer(1,1,40);
+      write(#179,' ',writepart(devarr[1].FIO,12):12 ,' '#179 ,' ', writepart(buffarr[1].year,5):5,' ',#179,' ',writepart(devarr[1].sex,8):8,' ',#179);
+      return(mid,devarr,n,f);
+      gotoxy(1,f);
+    end
+      else if (devmax>=15) then begin
+        next_page(t,l,14,mid);
+        return(mid,devarr,n,f);
+        gotoxy(1,f);
+      end;
+  end;
 //
 begin
   clrscr;
@@ -609,6 +716,7 @@ begin
         return(mid,devarr,n,j);
         gotoxy(1,j);
       end;
+      'S','s','Ы','ы':SortSecondTable(devarr,buffarr,devmax,mid,j,n);
     end;
   until exit=true;
 end;
